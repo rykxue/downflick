@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DownFlick - Multi-Platform Downloader</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .bg-gradient {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            background-size: 200% 200%;
+            animation: gradientBG 15s ease infinite;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        .downloader {
+            transition: transform 0.3s ease;
+        }
+        
+        .downloader:hover {
+            transform: translateY(-5px);
+        }
+        
+        @media (max-width: 640px) {
+            .container {
+                width: 95%;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient min-h-screen text-white">
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+        <div class="text-center mb-8">
+            <i class="fas fa-download text-4xl mb-2"></i>
+            <h1 class="text-4xl font-bold">DownFlick</h1>
+        </div>
+
+        <div class="glassmorphism p-6 mb-8">
+            <div class="downloader mb-6" id="tiktok">
+                <h2 class="text-xl font-semibold mb-3"><i class="fab fa-tiktok mr-2"></i>TikTok Downloader</h2>
+                <input type="url" id="tiktokUrl" placeholder="Enter TikTok URL" class="w-full p-2 mb-2 bg-white bg-opacity-10 rounded outline-none">
+                <select id="tiktokFormat" class="w-full p-2 mb-2 bg-white bg-opacity-10 rounded outline-none">
+                    <option value="mp4">MP4</option>
+                    <option value="mp3">MP3</option>
+                    <option value="images">Images (for slideshows)</option>
+                </select>
+                <button onclick="download('tiktok')" class="w-full p-2 bg-indigo-600 hover:bg-indigo-700 rounded font-semibold transition duration-300">Download</button>
+                <div id="tiktokStatus" class="mt-2 text-sm"></div>
+            </div>
+
+            <div class="downloader mb-6" id="youtube">
+                <h2 class="text-xl font-semibold mb-3"><i class="fab fa-youtube mr-2"></i>YouTube Downloader</h2>
+                <input type="url" id="youtubeUrl" placeholder="Enter YouTube URL" class="w-full p-2 mb-2 bg-white bg-opacity-10 rounded outline-none">
+                <select id="youtubeFormat" class="w-full p-2 mb-2 bg-white bg-opacity-10 rounded outline-none">
+                    <option value="mp4">MP4</option>
+                    <option value="mp3">MP3</option>
+                </select>
+                <button onclick="download('youtube')" class="w-full p-2 bg-indigo-600 hover:bg-indigo-700 rounded font-semibold transition duration-300">Download</button>
+                <div id="youtubeStatus" class="mt-2 text-sm"></div>
+            </div>
+
+            <div class="downloader mb-6" id="facebook">
+                <h2 class="text-xl font-semibold mb-3"><i class="fab fa-facebook mr-2"></i>Facebook Downloader</h2>
+                <input type="url" id="facebookUrl" placeholder="Enter Facebook URL" class="w-full p-2 mb-2 bg-white bg-opacity-10 rounded outline-none">
+                <select id="facebookFormat" class="w-full p-2 mb-2 bg-white bg-opacity-10 rounded outline-none">
+                    <option value="mp4">MP4</option>
+                    <option value="mp3">MP3</option>
+                </select>
+                <button onclick="download('facebook')" class="w-full p-2 bg-indigo-600 hover:bg-indigo-700 rounded font-semibold transition duration-300">Download</button>
+                <div id="facebookStatus" class="mt-2 text-sm"></div>
+            </div>
+
+            <div class="downloader" id="googledrive">
+                <h2 class="text-xl font-semibold mb-3"><i class="fab fa-google-drive mr-2"></i>Google Drive Downloader</h2>
+                <input type="url" id="googledriveUrl" placeholder="Enter Google Drive URL" class="w-full p-2 mb-2 bg-white bg-opacity-10 rounded outline-none">
+                <button onclick="download('googledrive')" class="w-full p-2 bg-indigo-600 hover:bg-indigo-700 rounded font-semibold transition duration-300">Download</button>
+                <div id="googledriveStatus" class="mt-2 text-sm"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function download(platform) {
+            const url = document.getElementById(`${platform}Url`).value;
+            const formatElement = document.getElementById(`${platform}Format`);
+            const format = formatElement ? formatElement.value : null;
+            const statusElement = document.getElementById(`${platform}Status`);
+
+            if (!url) {
+                showStatus(statusElement, 'Please enter a valid URL.', 'error');
+                return;
+            }
+
+            showStatus(statusElement, 'Downloading...', 'info');
+
+            let endpoint = `/download/${platform}`;
+            let body = { url };
+            if (format) {
+                body.format = format;
+            }
+
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `DownFlick-${platform}.${format || 'mp4'}`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                showStatus(statusElement, 'Download completed successfully!', 'success');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showStatus(statusElement, 'An error occurred during download.', 'error');
+            });
+        }
+
+        function showStatus(element, message, type) {
+            element.textContent = message;
+            element.className = `mt-2 text-sm ${type === 'error' ? 'text-red-500' : type === 'success' ? 'text-green-500' : 'text-blue-500'}`;
+        }
+    </script>
+</body>
+</html>
