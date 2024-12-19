@@ -1,0 +1,22 @@
+{
+  "name": "downflick",
+  "version": "1.0.0",
+  "description": "A multi-platform downloader for TikTok, YouTube, Facebook, and Google Drive.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Zyte",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.5.0",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7",
+    "googleapis": "^118.0.0",
+    "ytdl-core": "^4.11.1",
+    "@xaviabot/fb-downloader": "^2.0.2",
+    "mime-types": "^2.1.35",
+    "fluent-ffmpeg": "^2.1.2"
+  }
+}
