@@ -15,7 +15,7 @@
     "path": "^0.12.7",
     "googleapis": "^118.0.0",
     "ytdl-core": "^4.11.1",
-    "@xaviabot/fb-downloader": "^2.0.2",
+    "@xaviabot/fb-downloader": "^1.0.14",
     "mime-types": "^2.1.35",
     "fluent-ffmpeg": "^2.1.2"
   }
