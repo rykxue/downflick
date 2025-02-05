@@ -70,6 +70,7 @@
             font-family: 'Rajdhani', sans-serif;
             font-size: 1rem;
             transition: all 0.3s ease;
+            box-sizing: border-box;
         }
         
         input:focus, select:focus {
@@ -118,6 +119,20 @@
         
         h1 {
             animation: neonPulse 2s infinite;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .downloader {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
@@ -219,4 +234,5 @@
         }
     </script>
 </body>
-    </html>
+</html>
+
