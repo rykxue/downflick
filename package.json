@@ -17,6 +17,7 @@
     "ytdl-core": "^4.11.1",
     "@xaviabot/fb-downloader": "^1.0.14",
     "mime-types": "^2.1.35",
-    "fluent-ffmpeg": "^2.1.2"
+    "fluent-ffmpeg": "^2.1.2",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0"
   }
 }
