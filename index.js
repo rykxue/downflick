@@ -1,11 +1,13 @@
 const express = require("express")
-const axios = require("axios")
 const fs = require("fs")
 const path = require("path")
 const ytdl = require("ytdl-core")
 const getFBInfo = require("@xaviabot/fb-downloader")
-const mime = require("mime-types")
-const ffmpeg = require("fluent-ffmpeg")
+const { v4: uuidv4 } = require('uuid')
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path
+const ffmpeg = require('fluent-ffmpeg')
+ffmpeg.setFfmpegPath(ffmpegPath)
+const axios = require('axios'); // Import axios
 
 const app = express()
 const port = 9562
@@ -15,26 +17,31 @@ app.use(express.json())
 app.use(express.static(path.join(__dirname, "public")))
 
 function generateUniqueId() {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+  return uuidv4()
 }
 
 function formatDate() {
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const year = String(now.getFullYear()).slice(-2);
-  return `${month}${day}${year}`;
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  const hours = String(now.getHours()).padStart(2, '0')
+  const minutes = String(now.getMinutes()).padStart(2, '0')
+  const seconds = String(now.getSeconds()).padStart(2, '0')
+  return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`
 }
 
 // Helper: Convert MP4 to MP3 using ffmpeg
 async function convertToMP3(mp4Path) {
+  const fileName = path.basename(mp4Path, '.mp4')
+  const mp3Path = path.join(path.dirname(mp4Path), `${fileName}.mp3`)
   return new Promise((resolve, reject) => {
-    const mp3Path = mp4Path.replace(/\.mp4$/, ".mp3")
     ffmpeg(mp4Path)
-      .toFormat("mp3")
-      .on("end", () => resolve(mp3Path))
-      .on("error", reject)
-      .save(mp3Path)
+      .output(mp3Path)
+      .format('mp3')
+      .on('end', () => resolve(mp3Path))
+      .on('error', reject)
+      .run()
   })
 }
 
@@ -64,7 +71,7 @@ async function downloadTikTok(url, format) {
             reject(error)
           }
         } else {
-          resolve({ path: filePath, fileName: fileName }) // Return MP4 file directly
+          resolve({ path: filePath, fileName: fileName })
         }
       })
       writer.on("error", reject)
@@ -86,7 +93,10 @@ async function downloadYouTube(url, format) {
     const fileName = title || `ytvid-${date}-${generateUniqueId()}`
     const filePath = path.join(__dirname, `${fileName}.mp4`)
 
-    const stream = ytdl(normalizedUrl, { quality: format === "mp4" ? "highestvideo" : "highestaudio" })
+    const stream = ytdl(normalizedUrl, { 
+      quality: format === "mp4" ? "highestvideo" : "highestaudio",
+      filter: format === "mp4" ? "videoandaudio" : "audioonly"
+    })
     const writer = fs.createWriteStream(filePath)
     stream.pipe(writer)
 
